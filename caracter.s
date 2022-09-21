@@ -22,7 +22,7 @@ _start:
                               ex: 0001 -> 0010 */
                 add r0, #1
                 cmp r0, #7
-            beq loop2
+            beq loop2 
 
             setDisplay 1, DB7, DB6, DB5, DB4 @ envia o primeiro conjunto de dados para o display
             setDisplay 1, DB7, DB6, DB5, DB4 @ envia o segundo conjunto de dados para o display

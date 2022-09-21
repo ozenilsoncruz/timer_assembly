@@ -118,8 +118,19 @@
         inicirDisplay
         entryModeSet
 
+        @teste
+        setDisplay 1, 0, 0, 1, 1 @ envia o primeiro conjunto de dados para o display
+        setDisplay 1, 0, 0, 0, 1 @ envia o segundo conjunto de dados para o display
+        
+        entryModeSet                     @ move o cursor
 
+        setDisplay 1, 0, 0, 1, 1 @ envia o primeiro conjunto de dados para o display
+        setDisplay 1, 0, 0, 1, 0 @ envia o segundo conjunto de dados para o display
 
+        entryModeSet                     @ move o cursor
+
+        setDisplay 1, 0, 0, 1, 1 @ envia o primeiro conjunto de dados para o display
+        setDisplay 1, 0, 0, 1, 1 @ envia o segundo conjunto de dados para o display
 _end:
         mov R7,#1
         swi 0*/
@@ -139,7 +150,7 @@ _start:
                 ldr r3
                 and r2, r1, r3 @ faz um and entre r1 e r3 para saber se o bit esta ativo ou nao
                 
-                @ verificar logica >>> str r8, [r2, r0] @ adiciona o valor de r2 na memoria
+                @ verificar logica >>> str r8, [#?, ?] @ adiciona o valor de r2 na memoria
 
                 lsl r1, #1 /* desloca o bit para a esquerda
                               ex: 0001 -> 0010 */

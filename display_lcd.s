@@ -25,8 +25,20 @@
         GPIOValue pinE, #0              @ atribui 0 ao enble
 .endm
 
+@ Ativa ou desativa os pinos do display LCD
+.macro setDisplay2 RS, dados
+        GPIOValue pinE, #0              @ atribui 0 ao enable
+        GPIOValue pinRS, #\RS          
+        GPIOValue pinE, #1              @ atribui 1 ao enable
+        GPIOValue pinDB7, #\DB7   
+        GPIOValue pinDB6, #\DB6   
+        GPIOValue pinDB5, #\DB5 
+        GPIOValue pinDB4, #\DB4 
+        GPIOValue pinE, #0              @ atribui 0 ao enble
+.endm
+
 @ Modo de configuração de entrada
-.macro entrySetMode
+.macro entryModeSet
         setDisplay 0, 0, 0, 0, 0 
         setDisplay 0, 1, 1, 1, 0
         nanoSleep timespecnano150
@@ -83,7 +95,7 @@
         nanoSleep timespecnano150 
 .endm
 
-_start:
+/*_start:
 	ldr R0, =fileName
 	mov R1, #0x1b0
 	orr R1, #0x006
@@ -104,17 +116,54 @@ _start:
 
         setOut
         inicirDisplay
-        entrySetMode
+        entryModeSet
 
 
 
 _end:
         mov R7,#1
-        swi 0
+        swi 0*/
 
+
+_start:
+    ldr r10, =texto        @ passa o valor do texto para r10
+    mov r9, #0             @ tamanho do texto
+
+    loop:    @ loop que percorre cada caracter
+            ldrb r11, [r10, r9]  /* Load Register Byte 
+                                    Carrega o byte na posicao indicada*/
+            mov r0, #0
+            mov r1, #1
+
+            loop2:  @ percorre todos os 8 bits do bit para sabe o nivel logico
+                ldr r3
+                and r2, r1, r3 @ faz um and entre r1 e r3 para saber se o bit esta ativo ou nao
+                
+                @ verificar logica >>> str r8, [r2, r0] @ adiciona o valor de r2 na memoria
+
+                lsl r1, #1 /* desloca o bit para a esquerda
+                              ex: 0001 -> 0010 */
+                add r0, #1
+                cmp r0, #7
+            beq loop2
+
+            setDisplay 1, DB7, DB6, DB5, DB4 @ envia o primeiro conjunto de dados para o display
+            setDisplay 1, DB7, DB6, DB5, DB4 @ envia o segundo conjunto de dados para o display
+            entryModeSet                     @ move o cursor
+
+            add r9, #1
+            cmp r9, #len_texto
+    bne loop @ se r9 for diferente de 0, continue
+
+_end:
+    mov r7, #1
+    swi 0
+
+
+@ variaveis utilizadas no codigo
 .data
-        palavra: asciz "%d"
-        size_palavra: .-palavra
+        texto: .asciz "123456789"
+        len_texto = .-texto
 
 	second: .word 1
         timenano: .word 0000000000

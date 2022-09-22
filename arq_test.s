@@ -1,4 +1,4 @@
-/* display_lcd.s */
+* display_lcd.s */
 
 @ Constantes importantes para o programa
 .equ pagelen, 4096
@@ -230,14 +230,14 @@ _start:
         loop:    @ loop que percorre cada caracter
                 ldrb r11, [r10, r9]     @ Load Register Byte 
                                         @ carrega 1 byte na posicao indicada
-                mov r0, #0
-                mov r1, #1
+                mov r0, #7
+                mov r1, #32
                 loop_bit:  @ percorre todos os 8 bits do bit para sabe o nivel logico
                         and r4, r1, r11 @ faz um and entre r1 e r3 para saber se o bit esta ativo ou nao
                         cmp r4, #0
 			beq casos   @ se for igual a 0 valor nao sera alterado, se for diferente r2 = 1
                         
-			 mov r4, #1
+			mov r4, #1
                         casos:
                         @ se for 0 seta no pino DB4
                         cmp r0, #0
@@ -261,10 +261,8 @@ _start:
                         beq case4
 
                         case1:
-                                GPIOValue pinE, #0 @ atribui 0 ao enable
-                                GPIOValue pinRS, #1         
-                                GPIOValue pinE, #1
                                 GPIOValue pinDB4, r4
+				GPIOValue pinE, #0
                                 b retornar @ pula os outros casos
                         case2:
                                 GPIOValue pinDB5, r4
@@ -273,12 +271,14 @@ _start:
                                 GPIOValue pinDB6, r4
                                 b retornar @ pula os outros casos
                         case4:
+				GPIOValue pinE, #0 @ atribui 0 ao enable
+                                GPIOValue pinRS, #1         
+                                GPIOValue pinE, #1
                                 GPIOValue pinDB7, r4
-                                GPIOValue pinE, #0
                         retornar:
-                        lsl r1, #1      @ desloca o bit para a direita  ex: 0010 -> 0001
-                        add r0, #1      @ adiciona +1 a r0
-                        cmp r0, #7      @ compara o valor de r0 para saber se ja percorreu o ultimo bit
+                        lsr r1, #1      @ desloca o bit para a direita  ex: 0010 -> 0001
+                        sub r0, #1      @ adiciona +1 a r0
+                        cmp r0, #1      @ compara o valor de r0 para saber se ja percorreu o ultimo bit
 
                 bne loop_bit
 
@@ -347,3 +347,4 @@ _end:
 		.word 8
 		.word 3
 		.word 21
+

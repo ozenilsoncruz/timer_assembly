@@ -24,5 +24,5 @@
     
 
 .data
-    texto: .asciiz "%d\n"
+    texto: .asciiz "%s"
     len_texto = .-texto

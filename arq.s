@@ -227,45 +227,45 @@ _start:
                 loop_bit:  @ percorre todos os 8 bits do bit para sabe o nivel logico
                         and r4, r12, r11 @ faz um and entre r1 e r3 para saber se o bit esta ativo ou nao
                         cmp r4, #0 
-                        beq casos   @ se for igual a 0 valor nao sera alterado, se for diferente r2 = 1            
+                        beq switch   @ se for igual a 0 valor nao sera alterado, se for diferente r2 = 1            
                         mov r4, #1
-                        casos:
-                        @ se for 0 seta no pino DB4
-                        cmp r6, #0
-                        beq case4
-                        cmp r6, #4
-                        beq case4
-                        @ se for 1 seta no pino DB5
-                        cmp r6, #1
-                        beq case3
-                        cmp r6, #5
-                        beq case3
-                        @ se for 2 seta no pino DB6
-                        cmp r6, #2
-                        beq case2
-                        cmp r6, #6
-                        beq case2
-                        @ se for 3 seta no pino DB7
-                        cmp r6, #3
-                        beq case1
-                        cmp r6, #7
-                        beq case1
+                        switch:
+				@ se for 0 seta no pino DB4
+				cmp r6, #0
+				beq case4
+				cmp r6, #4
+				beq case4
+				@ se for 1 seta no pino DB5
+				cmp r6, #1
+				beq case3
+				cmp r6, #5
+				beq case3
+				@ se for 2 seta no pino DB6
+				cmp r6, #2
+				beq case2
+				cmp r6, #6
+				beq case2
+				@ se for 3 seta no pino DB7
+				cmp r6, #3
+				beq case1
+				cmp r6, #7
+				beq case1
 
-                        case1:
-                                GPIOValue pinE, #0 @ atribui 0 ao enable
-                                GPIOValue pinRS, #1
-                                GPIOValue pinE, #1
-                                GPIOValue pinDB7, r4
-                                b retornar @ pula os outros casos
-                        case2:
-                                GPIOValue pinDB6, r4
-                                b retornar  @ pula os outros casos
-                        case3:
-                                GPIOValue pinDB5, r4
-                                b retornar @ pula os outros casos
-                        case4:
-                                GPIOValue pinDB4, r4
-				GPIOValue pinE, #0
+				case1:
+					GPIOValue pinE, #0 @ atribui 0 ao enable
+					GPIOValue pinRS, #1
+					GPIOValue pinE, #1
+					GPIOValue pinDB7, r4
+					b retornar @ pula os outros casos
+				case2:
+					GPIOValue pinDB6, r4
+					b retornar  @ pula os outros casos
+				case3:
+					GPIOValue pinDB5, r4
+					b retornar @ pula os outros casos
+				case4:
+					GPIOValue pinDB4, r4
+					GPIOValue pinE, #0
                         retornar:
                         lsr r12, #1      @ desloca o bit para a direita  ex: 0010 -> 0001
                         sub r6, #1      @ adiciona +1 a r0

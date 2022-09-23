@@ -1,4 +1,4 @@
-* display_lcd.s */
+/* display_lcd.s */
 
 @ Constantes importantes para o programa
 .equ pagelen, 4096

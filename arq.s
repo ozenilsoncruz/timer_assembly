@@ -223,11 +223,12 @@ _start:
                                         @ carrega 1 byte na posicao indicada
 
 		mov r6, #7
-                mov r12, #256
+                mov r12, #128
                 loop_bit:  @ percorre todos os 8 bits do bit para sabe o nivel logico
                         and r4, r12, r11 @ faz um and entre r1 e r3 para saber se o bit esta ativo ou nao
                         cmp r4, #0 
                         beq casos   @ se for igual a 0 valor nao sera alterado, se for diferente r2 = 1            
+                        mov r4, #1
                         casos:
                         @ se for 0 seta no pino DB4
                         cmp r6, #0

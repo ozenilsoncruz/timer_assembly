@@ -286,7 +286,7 @@ _end:
 
 @ variaveis utilizadas no codigo
 .data
-        texto: .asciz "123456789"
+        texto: .asciz "Thiago de Jesus ááááááááaáá"
         len_texto = .-texto
 
         second: .word 1 @definindo 1 segundo no nanosleep

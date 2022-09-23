@@ -13,11 +13,20 @@
 .equ level, 52
  
 
-.macro nanoSleep time
-        ldr r0,=\time
-        ldr r1,=\time
-        mov r6, #nano_sleep
-        svc 0
+@----------------------Macro da nano sleep de ms--------------------@
+.macro nanoSleep timespecnano
+        LDR R0,=timespecsec @carrega o valor da variavel timespecsec
+        LDR R1,=\timespecnano @paramentro da macro
+        MOV R7, #nano_sleep
+        SVC 0
+.endm
+
+@----------------Macro da nano sleep de 1s para o contador----------@
+.macro nanoSleep1s time1s
+        LDR R0,=second  @adiciona o valor da variavel second
+        LDR R1,=\time1s @paramentro da macro
+        MOV R7, #nano_sleep
+        SVC 0
 .endm
 
 
@@ -74,7 +83,7 @@
 .endm
 
 
-.macro GPIOValue pin, value
+.macro GPIOValue pin value
         mov r0, #40     @valor do clear off set
         mov r2, #12     @valor que ao subtrair o clear off set resulta 28 o set
         mov r1, \value  @registra o valor 0 ou 1 no registrador
@@ -91,7 +100,7 @@
 .endm
 
 @ Chama a saida dos pinos do display
-.macro 	setOut
+.macro  setOut
         GPIODirectionOut pinE
         GPIODirectionOut pinRS
         GPIODirectionOut pinDB7
@@ -104,18 +113,18 @@
 @ Ativa ou desativa os pinos do display LCD
 .macro setDisplay RS, DB7, DB6, DB5, DB4
         GPIOValue pinE, #0              @ atribui 0 ao enable
-        GPIOValue pinRS, #\RS          
+        GPIOValue pinRS, #\RS
         GPIOValue pinE, #1              @ atribui 1 ao enable
         GPIOValue pinDB7, #\DB7
         GPIOValue pinDB6, #\DB6
         GPIOValue pinDB5, #\DB5
-        GPIOValue pinDB4, #\DB4 
+        GPIOValue pinDB4, #\DB4
         GPIOValue pinE, #0
 .endm
 
 @ Modo de configuração de entrada
 .macro entryModeSet
-        setDisplay 0, 0, 0, 0, 0 
+        setDisplay 0, 0, 0, 0, 0
         setDisplay 0, 1, 1, 1, 0
         nanoSleep timespecnano150
 
@@ -128,7 +137,7 @@
 @ Inicializa o display
 .macro inicirDisplay
         setDisplay 0, 0, 0, 1, 1  
-        nanoSleep timespecnano5  
+        nanoSleep timespecnano5
 
         setDisplay 0, 0, 0, 1, 1 
         nanoSleep timespecnano150  
@@ -145,7 +154,6 @@
 
         setDisplay 0, 0, 0, 0, 0
         nanoSleep timespecnano150 
-
         setDisplay 0, 0, 0, 0, 0 
 
         setDisplay 0, 1, 0, 0, 0  
@@ -171,60 +179,6 @@
         nanoSleep timespecnano150 
 .endm
 
-.macro escreveASCII texto
-        ldr r10, #\texto        @ passa o valor do texto para r10
-        mov r9, #0              @ tamanho do texto
-
-        loop:    @ loop que percorre cada caracter
-                ldrb r11, [r10, r9]     @ Load Register Byte 
-                                        @ carrega 1 byte na posicao indicada
-                mov r0, #0
-                mov r1, #1
-                loop_bit:  @ percorre todos os 8 bits do bit para sabe o nivel logico
-                        and r2, r1, r11 @ faz um and entre r1 e r3 para saber se o bit esta ativo ou nao
-                        cbz r2, casos   @ se for igual a 0 valor nao sera alterado, se for diferente r2 = 1
-                        mov r2, #1
-                        casos:
-                        @ se for 0 seta no pino DB4
-                        cbz r0, case1
-                        @ se for 1 seta no pino DB5
-                        cmp r0, #1
-                        beq case2
-                        @ se for 2 seta no pino DB6
-                        cmp r0, #2
-                        beq case3
-                        @ se for 3 seta no pino DB7
-                        cmp r0, #3
-                        beq case4
-                        case1:
-                                GPIOValue pinE, #0 @ atribui 0 ao enable
-                                GPIOValue pinRS, #1         
-                                GPIOValue pinE, #1
-                                GPIOValue pinDB4, r2
-                                b retornar @ pula os outros casos
-                        case2:
-                                GPIOValue pinDB5, r2
-                                b retornar  @ pula os outros casos
-                        case3:
-                                GPIOValue pinDB6, r2 
-                                b retornar @ pula os outros casos
-                        case4:
-                                GPIOValue pinDB7, r2
-                                GPIOValue pinE, #0
-                        retornar:
-                        lsl r1, #1      @ desloca o bit para a esquerda  ex: 0001 -> 0010
-                        add r0, #1      @ adiciona +1 a r0
-                        cmp r0, #7      @ compara o valor de r0 para saber se ja percorreu o ultimo bit
-
-                bne loop_bit
-
-                entryModeSet            @ move o cursor
-
-                add r9, #1
-                cmp r9, #31
-        bne loop @ se r9 for diferente de 0, continue
-.endm
-
 .global _start
 
 _start:
@@ -232,7 +186,7 @@ _start:
 	mov r1, #0x1b0
 	orr r1, #0x006
 	mov r2, r1
-	mov r6, #sys_open
+	mov r7, #sys_open
 	swi 0
 	movs r4, r0
 
@@ -242,96 +196,82 @@ _start:
 	mov r2, #(prot_read + prot_write)
 	mov r3, #map_shared
 	mov r0, #0
-	mov r6, #sys_map
+	mov r7, #sys_map
 	swi 0
 	movs r8, r0
 
         setOut
         inicirDisplay
         entryModeSet
-
-        @teste                   
-                                 @ 1
-        setDisplay 1, 0, 0, 1, 1 @ envia o primeiro conjunto de dados para o display
-        setDisplay 1, 0, 0, 0, 1 @ envia o segundo conjunto de dados para o display
-        
-        entryModeSet                     @ move o cursor
-                                 @ 2
-        setDisplay 1, 0, 0, 1, 1 @ envia o primeiro conjunto de dados para o display
-        setDisplay 1, 0, 0, 1, 0 @ envia o segundo conjunto de dados para o display
-
-        entryModeSet                     @ move o cursor
-                                @ 3
-        setDisplay 1, 0, 0, 1, 1 @ envia o primeiro conjunto de dados para o display
-        setDisplay 1, 0, 0, 1, 1 @ envia o segundo conjunto de dados para o display
-        
         /*mov r6, #9
         contador:
                 nanoSleep timeSecond       @ aguarda 1 segundo
                 sub r6, #1
-        cbnz contador       @ loop infinito*/
-        
-        /*
+                cmp r6, #0
+        beq contador       @ loop infinito*/
+
         ldr r10, =texto        @ passa o valor do texto para r10
-        mov r9, #0             @ tamanho do texto
+        mov r9, #0         @ tamanho do texto
 
         loop:    @ loop que percorre cada caracter
                 ldrb r11, [r10, r9]     @ Load Register Byte 
                                         @ carrega 1 byte na posicao indicada
-                mov r0, #0
-                mov r1, #1
+                mov r6, #7
+                mov r12, #32
                 loop_bit:  @ percorre todos os 8 bits do bit para sabe o nivel logico
-                        and r2, r1, r11 @ faz um and entre r1 e r3 para saber se o bit esta ativo ou nao
-                        cbz r2, casos   @ se for igual a 0 valor nao sera alterado, se for diferente r2 = 1
-                        mov r2, #1
+                        and r4, r12, r11 @ faz um and entre r1 e r3 para saber se o bit esta ativo ou nao
+                        cmp r4, #0
+                        beq casos   @ se for igual a 0 valor nao sera alterado, se for diferente r2 = 1            
+                        mov r4, #1
                         casos:
                         @ se for 0 seta no pino DB4
-                        cbz r0, case1
-                        cmp r0, #4
-                        beq case1
+                        cmp r6, #0
+                        beq case4
+                        cmp r6, #4
+                        beq case4
                         @ se for 1 seta no pino DB5
-                        cmp r0, #1
-                        beq case2
-                        cmp r0, #5
-                        beq case2
+                        cmp r6, #1
+                        beq case3
+                        cmp r6, #5
+                        beq case3
                         @ se for 2 seta no pino DB6
-                        cmp r0, #2
-                        beq case3
-                        cmp r0, #6
-                        beq case3
+                        cmp r6, #2
+                        beq case2
+                        cmp r6, #6
+                        beq case2
                         @ se for 3 seta no pino DB7
-                        cmp r0, #3
-                        beq case4
-                        cmp r0, #7
-                        beq case4
+                        cmp r6, #3
+                        beq case1
+                        cmp r6, #7
+                        beq case1
 
                         case1:
                                 GPIOValue pinE, #0 @ atribui 0 ao enable
                                 GPIOValue pinRS, #1         
                                 GPIOValue pinE, #1
-                                GPIOValue pinDB4, r2
+                                GPIOValue pinDB7, r4
                                 b retornar @ pula os outros casos
                         case2:
-                                GPIOValue pinDB5, r2
+                                GPIOValue pinDB6, r4
                                 b retornar  @ pula os outros casos
                         case3:
-                                GPIOValue pinDB6, r2 
+                                GPIOValue pinDB5, r4
                                 b retornar @ pula os outros casos
                         case4:
-                                GPIOValue pinDB7, r2
-                                GPIOValue pinE, #0
+                                GPIOValue pinDB4, r4
+				GPIOValue pinE, #0
                         retornar:
-                        lsl r1, #1      @ desloca o bit para a esquerda  ex: 0001 -> 0010
-                        add r0, #1      @ adiciona +1 a r0
-                        cmp r0, #7      @ compara o valor de r0 para saber se ja percorreu o ultimo bit
-
+                        lsr r12, #1      @ desloca o bit para a direita  ex: 0010 -> 0001
+                        sub r6, #1      @ adiciona +1 a r0
+                        cmp r6, #0      @ compara o valor de r0 para saber se ja percorreu o ultimo bit
                 bne loop_bit
 
-                entryModeSet            @ move o cursor
-
                 add r9, #1
+                
+                entryModeSet            @ move o cursor
+                
                 cmp r9, #len_texto
-        bne loop @ se r9 for diferente de 0, continue*/
+        bne loop
 
 _end:
     mov r7, #1
@@ -343,9 +283,13 @@ _end:
         texto: .asciz "123456789"
         len_texto = .-texto
 
-        timeSecond: .word 1
-        timespecnano5: .word 5000000
-        timespecnano150: .word 150000
+        second: .word 1 @definindo 1 segundo no nanosleep
+	timenano: .word 0000000000 @definindo o milisegundos para o segundo passar no nanosleep
+	timespecsec: .word 0 @definição do nano sleep 0s permitindo os milissegundos
+	timespecnano20: .word 20000000 @chamada de nanoSleep
+	timespecnano5: .word 5000000 @valor em milisegundos para lcd
+	timespecnano150: .word 150000 @valor em milisegundos para LCD
+	timespecnano1s: .word 999999999 @valor para delay de contador
 
 	fileName: .asciz "/dev/mem"
 	gpioaddr: .word 0x20200 @carrega o endereco os onde registradores do controlador GPIO são mapeados na memória
@@ -388,3 +332,4 @@ _end:
 		.word 8
 		.word 3
 		.word 21
+

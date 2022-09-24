@@ -1,8 +1,10 @@
-display_lcd: display_lcd.o
-	ld -o display_lcd display_lcd.o
+nome = display_lcd
 
-display_lcd.o: display_lcd.s
-	as -g -o display_lcd.o display_lcd.s
+$(nome): $(nome).o
+	ld -o $(nome) $(nome).o
+
+$(nome).o: $(nome).s
+	as -g -o $(nome).o $(nome).s
 
 clean:
-  rm -i *.o *~
+  rm *.o

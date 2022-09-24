@@ -83,7 +83,6 @@
 
 .global _start
 
-
 _start:
 	ldr r0, =fileName
 	mov r1, #0x1b0

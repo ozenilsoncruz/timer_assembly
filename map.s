@@ -29,10 +29,35 @@
         SVC 0
 .endm
 
+/*======================================================
+        Funcao de espara
+  ======================================================
+        Entradas:
+                segundos: segundo a aguardar
+                milissegundo: milissegundo a aguardar
+        Registradores utilizados: r0, r1, r7
+                obs:    r0 carrega o valor em s
+                        r1 carrega o valor em ms
+  ------------------------------------------------------*/
+.macro nanosleep2 segundo, milissegundo
+        LDR R0,=\segundo        @adiciona o valor da variavel second
+        LDR R1,=\milissegundo   @paramentro da macro
+        MOV R7, #nano_sleep
+        SVC 0
+.endm
 
+/*======================================================
+        ----------------------------------
+  ======================================================
+        Entradas:  
+                pin: pino a ser acessado
+        Registradores utilizados: r0, r2, r3, r8
+                obs:    r2 carrega ...
+                        r3 carrega o pino
+  ------------------------------------------------------*/
 .macro GPIOReadRegister pin
-        mov r2, r8      @Endereço dos registradores da GPIO
-        add r2, #level  @offset para acessar o registrador do pin level 0x34 
+        mov r2, r8      @ Endereço dos registradores da GPIO
+        add r2, #level  @ offset para acessar o registrador do pin level 0x34 
         ldr r2, [r2]    @ pino5, 19 e 26 ativos respectivamentes
         ldr r3, =\pin   @ base dos dados do pino
         add r3, #8      @ offset para acessar a terceira word

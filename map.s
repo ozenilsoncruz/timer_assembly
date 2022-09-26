@@ -123,3 +123,54 @@
         lsl r0, r3      @realiza a mudança
         str r0, [r2]    @Escreve no registro
 .endm
+
+.macro map
+        ldr r0, =fileName
+	mov r1, #0x1b0
+	orr r1, #0x006
+	mov r2, r1
+	mov r7, #sys_open
+	swi 0
+	movs r4, r0
+
+	ldr r5, =gpioaddr
+	ldr r5, [r5]
+	mov r1, #pagelen
+	mov r2, #(prot_read + prot_write)
+	mov r3, #map_shared
+	mov r0, #0
+	mov r7, #sys_map
+	swi 0
+	movs r8, r0
+.endm
+
+/*======================================================
+        Realiza a entrada de dados na tela (input)
+  ======================================================
+        Registradores utilizados: r0, r1, r2, r7
+                obs: r1 carrega o variavel
+
+  ------------------------------------------------------*/
+.macro input variavel, len_variavel
+        mov r0, #1          @ atribui 1 ao r0 para escrever na tela
+        ldr r1, =\variavel      @ dado para impressao
+        mov r2, #\len_variavel  @ tamanho da palavra a ser exidido
+        mov r7, #3          @ chamada de sistema para escrita
+        swi 0
+.endm
+
+/*======================================================
+        Realiza a impressao na tela (print)
+  ======================================================
+        Entradas:
+                variavel -> variavel a ser exibido na tela
+                len_variavel -> tamanho do variavel
+        Registradores utilizados: r0, r1, r2, r7
+  ------------------------------------------------------*/
+.macro print variavel, len_variavel
+        mov r0, #1          @ atribui 1 ao r0 para escrever na tela
+        ldr r1, =\variavel      @ dado para impressao
+        mov r2, #\len_variavel  @ tamanho da palavra a ser exidido
+        mov r7, #4          @ chamada de sistema para escrita
+        swi 0 
+.endm

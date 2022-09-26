@@ -1,10 +1,8 @@
-nome = display_lcd
+main = display_lcd
 
-$(nome): $(nome).o
-	ld -o $(nome) $(nome).o
-
-$(nome).o: $(nome).s
-	as -g -o $(nome).o $(nome).s
-
-clean:
-  rm *.o
+$(main): $(main).o
+	ld -o $(main) $(main).o
+	rm *.o
+	
+$(main).o: $(main).s
+	as -g -o $(main).o $(main).s

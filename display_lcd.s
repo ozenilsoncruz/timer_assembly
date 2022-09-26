@@ -252,7 +252,7 @@ _start:
         mov r9, #len_num
         sub r9, #1
         	
-		cmp r9, #31
+	cmp r9, #31
         bgt _erro1                  @ se for maior, que 31, 
 
         ldr r10, =num               @ passa o valor do num para r10
@@ -289,8 +289,8 @@ _start:
                 cmp r11, #48
                 bne subtrai
                 
-                        cmp r9, #0          @ se r9 for 0, todos os caracteres foram percorridos, logo, contagem acabou
-                beq _end                    @ desvia para encerrar o contador
+                cmp r9, #0          @ se r9 for 0, todos os caracteres foram percorridos, logo, contagem acabou
+                beq _fim                    @ desvia para encerrar o contador
 
                 mov r11, #57                @ adiciona o digito 9 ao registrador r1   
                 strb r11, [r10, r9]         @ registra no byte especificado
@@ -303,7 +303,7 @@ _start:
                         ldrb r11, [r10, r6] @ carrega o byte especificado
 
                         cmp r11, #49        @ compara com '1'
-                        bge subtrair_anterior            @ se maior ou igual a 1, subtrai 1
+                        bgt subtrair_anterior            @ se maior ou igual a 1, subtrai 1
                         @ verifica se r6 e zero, se for, remove
                         cmp r6, #0
                         bne verificar_1

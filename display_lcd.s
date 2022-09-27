@@ -248,12 +248,11 @@ _start:
 	
         @ Verifica se os caracteres inseridos foram corretos
 	verificacao_erros:
-        @ verifica se o numero esta dentro do limite permitido
-        mov r9, #len_num
-        sub r9, #1
-        	
-	cmp r9, #31
-        bgt _erro1                  @ se for maior, que 31, 
+                @ verifica se o numero esta dentro do limite permitido
+                mov r9, #len_num
+                sub r9, #1     
+                cmp r9, #31
+                bgt _erro1                  @ se for maior, que 31, 
 
         ldr r10, =num               @ passa o valor do num para r10
         @ varifica se a string contem apenas numero
@@ -265,10 +264,8 @@ _start:
             blt _erro2
             cmp r11, #57 @'9' 
             bgt _erro2
-
             cmp r9, #0      @ compara com o tamanho do caractere -1
             ble contador    @ se for menor ou igual a zero, devia para o contador
-
             sub r9, #1
         b verificacao_num
         
@@ -289,41 +286,39 @@ _start:
                 cmp r11, #48
                 bne subtrai
                 
-                cmp r9, #0          @ se r9 for 0, todos os caracteres foram percorridos, logo, contagem acabou
+                cmp r9, #0                  @ se r9 for 0, todos os caracteres foram percorridos, logo, contagem acabou
                 beq _fim                    @ desvia para encerrar o contador
 
-                mov r11, #57                @ adiciona o digito 9 ao registrador r1   
+                mov r11, #57              @ adiciona o digito 9 ao registrador r1   
                 strb r11, [r10, r9]         @ registra no byte especificado
 
 
                 @ atribui r9 a um registrador auxiliar
-                mov r6, r9
+                @ mov r6, r9
                 loop_anteriores:            @ faz um loop de todos os anteriores ate que encontre um inteiro
-                        sub r6, #1          @ remove 1 de r6 para selecionar o byte anterior
-                        ldrb r11, [r10, r6] @ carrega o byte especificado
+                        sub r9, #1          @ remove 1 de r6 para selecionar o byte anterior
+                        ldrb r11, [r10, r9] @ carrega o byte especificado
 
-                        cmp r11, #49        @ compara com '1'
-                        bgt subtrair_anterior            @ se maior ou igual a 1, subtrai 1
+                        cmp r11, #48        @ compara com '0'
+                        bne subtrair_anterior      @ se nao for 0, subtrai 1
                         @ verifica se r6 e zero, se for, remove
-                        cmp r6, #0
+                        cmp r9, #0
                         bne verificar_1
 
-                        mov r11, #0
-                        strb r11, [r10, r6]
-
-                        b while_num
+                        @ se chegar em r9 = 0 e o valor contidor for '0', encerra o loop
+                        b _fim
 
                         verificar_1:
-                        cmp r11, #48
-                        bne subtrair_anterior
+                                cmp r11, #48
+                                bne subtrair_anterior
 
-                        mov r11, #57
-                        strb r11, [r10, r6]
+                                mov r11, #57
+                                strb r11, [r10, r9]
                         b loop_anteriores
 
                         subtrair_anterior:
-                        sub r11, #1    @ subtrai 1
-                        strb r11, [r10, r6]
+                                sub r11, #1    @ subtrai 1
+                                strb r11, [r10, r9]
                         b while_num
                 b loop_anteriores
 
@@ -357,17 +352,17 @@ _end:
         num: .ascii "10"
         len_num = .-num
 
-        erro_num: .asciz "Nao e um numero inteiro!" 
-        len_erro_num = .-erro_num -1
+        erro_num: .ascii "Nao e um numero inteiro!" 
+        len_erro_num = .-erro_num
 
-        erro_size: .asciz "Numero muito grande!" 
-        len_erro_size = .-erro_size -1
+        erro_size: .ascii "Numero muito grande!" 
+        len_erro_size = .-erro_size
 
-        fim: .asciz "Fim!"
-        len_fim = .-fim -1
+        fim: .ascii "Fim!"
+        len_fim = .-fim
 
-        pular_linha: .asciz "\n"
-        len_pular_linha = .-pular_linha -1
+        pular_linha: .ascii "\n"
+        len_pular_linha = .-pular_linha
 
         second: .word 1 @definindo 1 segundo no nanosleep
 	timenano: .word 0000000000 @definindo o milisegundos para o segundo passar no nanosleep

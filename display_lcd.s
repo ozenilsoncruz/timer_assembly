@@ -51,11 +51,11 @@
 .macro entryModeSet
         setDisplay 0, 0, 0, 0, 0
         setDisplay 0, 1, 1, 1, 0
-        nanoSleep 0, timespecnano150
+        nanoSleep 0, timespecmicro150
 
         setDisplay 0, 0, 0, 0, 0
         setDisplay 0, 0, 1, 1, 0
-        nanoSleep 0, timespecnano150
+        nanoSleep 0, timespecmicro150
         .ltorg
 .endm
 
@@ -71,37 +71,37 @@
   ------------------------------------------------------*/
 .macro iniciar
         setDisplay 0, 0, 0, 1, 1  
-        nanoSleep 0, timespecnano5
+        nanoSleep 0, timespecmili5
 
         setDisplay 0, 0, 0, 1, 1 
-        nanoSleep 0, timespecnano150  
+        nanoSleep 0, timespecmicro150  
 
         setDisplay  0, 0, 0, 1, 1
 
 
         setDisplay 0, 0, 0, 1, 0
-        nanoSleep 0, timespecnano150  
+        nanoSleep 0, timespecmicro150  
 
         .ltorg 
 
         setDisplay 0, 0, 0, 1, 0 
 
         setDisplay 0, 0, 0, 0, 0
-        nanoSleep 0, timespecnano150 
+        nanoSleep 0, timespecmicro150 
         setDisplay 0, 0, 0, 0, 0 
 
         setDisplay 0, 1, 0, 0, 0  
-        nanoSleep 0, timespecnano150
+        nanoSleep 0, timespecmicro150
 
         setDisplay 0, 0, 0, 0, 0  
 
         setDisplay 0, 0, 0, 0, 1  
-        nanoSleep 0, timespecnano150 
+        nanoSleep 0, timespecmicro150 
 
         setDisplay 0, 0, 0, 0, 0
 
         setDisplay 0, 0, 1, 1, 0 
-        nanoSleep 0, timespecnano150
+        nanoSleep 0, timespecmicro150
 
         .ltorg
 .endm
@@ -118,7 +118,7 @@
 .macro clearDisplay
         setDisplay 0, 0, 0, 0, 0
         setDisplay 0, 0, 0, 0, 1
-        nanoSleep 0, timespecnano150 
+        nanoSleep 0, timespecmicro150 
 .endm
 
 /*======================================================
@@ -277,7 +277,7 @@ _start:
 
                 @setString num len_num   @ mostra um numero no display 
                 clearDisplay             @ limpa a tela do display
-                nanosleep second, 0      @ aguarda 1 segundo
+                nanosleep segundo, 0      @ aguarda 1 segundo
 
                 @r9 tem guardado a qtd de numeros-1
                 @ldr r10, =num
@@ -376,13 +376,9 @@ _end:
         pular_linha: .ascii "\n"
         len_pular_linha = .-pular_linha
 
-        second: .word 1 @definindo 1 segundo no nanosleep
-	timenano: .word 0000000000 @definindo o milisegundos para o segundo passar no nanosleep
-	timespecsec: .word 0 @definição do nano sleep 0s permitindo os milissegundos
-	timespecnano20: .word 20000000 @chamada de nanoSleep
-	timespecnano5: .word 5000000 @valor em milisegundos para lcd
-	timespecnano150: .word 150000 @valor em milisegundos para LCD
-	timespecnano1s: .word 999999999 @valor para delay de contador
+        segundo: .word 1                @ 1 segundo
+	timespecmili5: .word 5000000    @ 5 milisegundos
+	timespecmicro150: .word 150000  @ 150 microssegundos
 
 	fileName: .asciz "/dev/mem"
 	gpioaddr: .word 0x20200 @carrega o endereco os onde registradores do controlador GPIO são mapeados na memória

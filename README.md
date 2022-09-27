@@ -31,9 +31,6 @@ Com o objetivo de desenvolver uma biblioteca para uso futuro em conjunto com um 
 
 </details>
 
-## Introdução
-
-
 
 ## Desenvolvimento
 

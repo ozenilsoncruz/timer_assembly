@@ -247,8 +247,8 @@
 
 _start:
 	iniciar_display
-
-    @ Verifica se os caracteres inseridos foram corretos
+	setString num len_num   @ mostra um numero no display
+    /*@ Verifica se os caracteres inseridos foram corretos
 	verificacao_erros:
         @ verifica se o numero esta dentro do limite permitido
         mov r9, #len_num
@@ -259,8 +259,8 @@ _start:
     @ varifica se a string contem apenas numero
     verificacao_num:            @ loop que percorre cada caracter
         sub r9, #1
-        ldrb r11, [r10, r9]     /* Load Register Byte 
-                                carrega 1 byte na posicao indicada*/
+        ldrb r11, [r10, r9]     @ Load Register Byte 
+                                @ carrega 1 byte na posicao indicada
         @ se for menor que 48 ou maior que 57, desvia para informar que nao e um numero
         cmp r11, #48 @'0'
         blt _erro2
@@ -363,7 +363,7 @@ _fim:
     @setString fim len_fim
     print pular_linha len_pular_linha
     print fim len_fim
-	print pular_linha len_pular_linha
+	print pular_linha len_pular_linha*/
 _end:
     mov r7, #1
     swi 0

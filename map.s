@@ -13,22 +13,6 @@
 .equ level, 52
  
 
-@----------------------Macro da nano sleep de ms--------------------@
-.macro nanoSleep timespecnano
-        LDR R0,=timespecsec @carrega o valor da variavel timespecsec
-        LDR R1,=\timespecnano @paramentro da macro
-        MOV R7, #nano_sleep
-        SVC 0
-.endm
-
-@----------------Macro da nano sleep de 1s para o contador----------@
-.macro nanoSleep1s time1s
-        LDR R0,=second  @adiciona o valor da variavel second
-        LDR R1,=\time1s @paramentro da macro
-        MOV R7, #nano_sleep
-        SVC 0
-.endm
-
 /*======================================================
         Funcao de espara
   ======================================================
@@ -39,7 +23,7 @@
                 obs:    r0 carrega o valor em s
                         r1 carrega o valor em ms
   ------------------------------------------------------*/
-.macro nanosleep2 segundo, milissegundo
+.macro nanosleep segundo, milissegundo
         LDR R0,=\segundo        @adiciona o valor da variavel second
         LDR R1,=\milissegundo   @paramentro da macro
         MOV R7, #nano_sleep
@@ -47,7 +31,7 @@
 .endm
 
 /*======================================================
-        ----------------------------------
+        Analisa qual botao foi precionado
   ======================================================
         Entradas:  
                 pin: pino a ser acessado
@@ -84,30 +68,6 @@
 .endm
 
 
-.macro GPIOTurnOn pin
-        mov r2, r8 @ address of gpio regs
-        add r2, #setregoffset @ off to set reg
-        mov r0, #1 @ 1 bit to shift into pos
-        ldr r3, =\pin @ base of pin info table
-        add r3, #8 @ add offset for shift amt
-        ldr r3, [r3] @ load shift from table
-        lsl r0, r3 @ do the shift
-        str r0, [r2] @ write to the register
-.endm
-
-
-.macro GPIOTurnOff pin
-        mov r2, r8 @ address of gpio regs
-        add r2, #clrregoffset @ off set of clr reg
-        mov r0, #1 @ 1 bit to shift into pos
-        ldr r3, =\pin @ base of pin info table
-        add r3, #8
-        ldr r3, [r3]
-        lsl r0, r3
-        str r0, [r2]
-.endm
-
-
 .macro GPIOValue pin value
         mov r0, #40     @valor do clear off set
         mov r2, #12     @valor que ao subtrair o clear off set resulta 28 o set
@@ -124,6 +84,15 @@
         str r0, [r2]    @Escreve no registro
 .endm
 
+
+/*======================================================
+        Realiza o mapeamento dos pinos do display
+  ======================================================
+        Registradores utilizados: r0, r1, r2, r3 r4, r5, 
+                                  r7, r8
+        
+        obs: r8 guarda os dados mapeamento
+  ------------------------------------------------------*/
 .macro map
         ldr r0, =fileName
 	mov r1, #0x1b0

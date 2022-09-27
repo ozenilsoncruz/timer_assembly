@@ -51,11 +51,11 @@
 .macro entryModeSet
         setDisplay 0, 0, 0, 0, 0
         setDisplay 0, 1, 1, 1, 0
-        nanoSleep timespecnano150
+        nanoSleep 0, timespecnano150
 
         setDisplay 0, 0, 0, 0, 0
         setDisplay 0, 0, 1, 1, 0
-        nanoSleep timespecnano150
+        nanoSleep 0, timespecnano150
         .ltorg
 .endm
 
@@ -69,39 +69,39 @@
                 nanoSleep: presente no map.s, utilizada
                 para aguardar um determinado tempo
   ------------------------------------------------------*/
-.macro inicirDisplay
+.macro iniciar
         setDisplay 0, 0, 0, 1, 1  
-        nanoSleep timespecnano5
+        nanoSleep 0, timespecnano5
 
         setDisplay 0, 0, 0, 1, 1 
-        nanoSleep timespecnano150  
+        nanoSleep 0, timespecnano150  
 
         setDisplay  0, 0, 0, 1, 1
 
 
         setDisplay 0, 0, 0, 1, 0
-        nanoSleep timespecnano150  
+        nanoSleep 0, timespecnano150  
 
         .ltorg 
 
         setDisplay 0, 0, 0, 1, 0 
 
         setDisplay 0, 0, 0, 0, 0
-        nanoSleep timespecnano150 
+        nanoSleep 0, timespecnano150 
         setDisplay 0, 0, 0, 0, 0 
 
         setDisplay 0, 1, 0, 0, 0  
-        nanoSleep timespecnano150
+        nanoSleep 0, timespecnano150
 
         setDisplay 0, 0, 0, 0, 0  
 
         setDisplay 0, 0, 0, 0, 1  
-        nanoSleep timespecnano150 
+        nanoSleep 0, timespecnano150 
 
         setDisplay 0, 0, 0, 0, 0
 
         setDisplay 0, 0, 1, 1, 0 
-        nanoSleep timespecnano150
+        nanoSleep 0, timespecnano150
 
         .ltorg
 .endm
@@ -118,7 +118,7 @@
 .macro clearDisplay
         setDisplay 0, 0, 0, 0, 0
         setDisplay 0, 0, 0, 0, 1
-        nanoSleep timespecnano150 
+        nanoSleep 0, timespecnano150 
 .endm
 
 /*======================================================
@@ -129,7 +129,7 @@
                 cada bit que representa o caractere
         Entradas:
                 caractere: caractere a ser exibido no display
-        Registradores utilizados: r4, r6, r11, r12
+        Registradores utilizados: r1, r6, r11, r12
                 obs: r11 recebe o caractere
   ------------------------------------------------------*/
 .macro setCaractere caractere
@@ -138,10 +138,10 @@
         mov r12, #256           @ variavel auxiliar que define qual bit esta ativo
         loop_bit:               @ percorre todos os 8 bits do bit para sabe o nivel logico
                 lsr r12, #1      @ desloca o bit para a direita  ex: 100000000 -> 010000000
-                and r4, r12, r11 @ faz um and entre r1 e r3 para saber se o bit esta ativo ou nao
-                cmp r4, #0
+                and r1, r12, r11 @ faz um and entre r1 e r3 para saber se o bit esta ativo ou nao
+                cmp r1, #0
                 beq switch 	 @ se for igual a 0 valor nao sera alterado, se for diferente r2 = 1            
-                mov r4, #1
+                mov r1, #1
                 switch:
                         @ se for 0 seta no pino DB4
                         cmp r6, #0
@@ -168,16 +168,16 @@
                                 GPIOValue pinE, #0 @ atribui 0 ao enable
                                 GPIOValue pinRS, #1
                                 GPIOValue pinE, #1
-                                GPIOValue pinDB7, r4
+                                GPIOValue pinDB7, r1
                                 b retornar @ pula os outros casos
                         case2:
-                                GPIOValue pinDB6, r4
+                                GPIOValue pinDB6, r1
                                 b retornar  @ pula os outros casos
                         case3:
-                                GPIOValue pinDB5, r4
+                                GPIOValue pinDB5, r1
                                 b retornar @ pula os outros casos
                         case4:
-                                GPIOValue pinDB4, r4
+                                GPIOValue pinDB4, r1
                                 GPIOValue pinE, #0
                         retornar:
                                 sub r6, #1       @ subtrai +1 a r0
@@ -211,75 +211,84 @@
         bne loop_byte
 .endm
 
-.macro iniciar
-        @ realiza o mapeamento dos pinos
+/*======================================================
+        Realiza a inicializacao do display, bem como o 
+        mapeamento dos pinos
+  ======================================================
+        Macros utilizadas:  
+                map: uusado paraealiza o mapeamento dos pinos
+                setOut: usado para setar as saidas dos display
+                iniciar: segue as instrucoes do datashit para inicia-
+                lizar o display no modo de 4 bits
+                entryModeSet: usado para dizer o tipo de deslocamento 
+                do cursor
+  ------------------------------------------------------*/
+.macro iniciar_display
         map
 
         @ direciona as saidas do display
         setOut
-        inicirDisplay
+        iniciar
         entryModeSet
 .endm
 
 .global _start
 
 _start:
-	ldr r0, =fileName
-	mov r1, #0x1b0
-	orr r1, #0x006
-	mov r2, r1
-	mov r7, #sys_open
-	swi 0
-	movs r4, r0
-
-	ldr r5, =gpioaddr
-	ldr r5, [r5]
-	mov r1, #pagelen
-	mov r2, #(prot_read + prot_write)
-	mov r3, #map_shared
-	mov r0, #0
-	mov r7, #sys_map
-	swi 0
-	movs r8, r0
-
-        setOut
-        inicirDisplay
-        entryModeSet
+	iniciar_display
 	
+        /*iniciar:
+		GPIOReadRegister pin19
+                cmp r0, r3
+                bne contagem
+        b inciar*/
+
+
         @ Verifica se os caracteres inseridos foram corretos
 	verificacao_erros:
                 @ verifica se o numero esta dentro do limite permitido
                 mov r9, #len_num
-                sub r9, #1     
-                cmp r9, #31
-                bgt _erro1                  @ se for maior, que 31, 
+                cmp r9, #32
+                bgt _erro1                  @ se for maior, que 32, erro!
 
         ldr r10, =num               @ passa o valor do num para r10
         @ varifica se a string contem apenas numero
         verificacao_num:            @ loop que percorre cada caracter
-            ldrb r11, [r10, r9]     /* Load Register Byte 
-                                    carrega 1 byte na posicao indicada*/
-            @ se for menor que 48 ou maior que 57, desvia para informar que nao e um numero
-            cmp r11, #48 @'0'
-            blt _erro2
-            cmp r11, #57 @'9' 
-            bgt _erro2
-            cmp r9, #0      @ compara com o tamanho do caractere -1
-            ble contador    @ se for menor ou igual a zero, devia para o contador
-            sub r9, #1
+                sub r9, #1
+                ldrb r11, [r10, r9]     /* Load Register Byte 
+                                        carrega 1 byte na posicao indicada*/
+                @ se for menor que 48 ou maior que 57, desvia para informar que nao e um numero
+                cmp r11, #48 @'0'
+                blt _erro2
+                cmp r11, #57 @'9' 
+                bgt _erro2
+                cmp r9, #0      @ compara com o tamanho do caractere -1
+                ble contador    @ se for menor ou igual a zero, devia para o contador
         b verificacao_num
         
-	contador:
-                @encontre um jeito de parar esse loop e já era
-                while_num:
+        contador:
+                @ verifica se o botao do pino 19 foi precionado novamente, se sim, pausa
+                /*GPIOReadRegister pin19 
+                        cmp r0, r3
+                bne contagem
+                @ verifica se o botao do pino 26 foi precionado, se sim, reinicia
+                GPIOReadRegister pin26
+                        cmp r0, r3
+                bne _start*/
+
+                @clearDisplay            @ limpa a tela do display
+                @nanosleep second, 0     @ aguarda 1 segundo
+                setString num len_num   @ mostra um numero no display 
+
                 @ r9 tem guardado a qtd de numeros-1
                 ldr r10, =num
-                mov r9, #len_num
-                sub r9, #1              @ subtrai 1 de r9 para ser igual a posicao do ultimo caractere
 
                 print pular_linha len_pular_linha
                 print num len_num
                 print pular_linha len_pular_linha
+
+                mov r9, #len_num
+                sub r9, #1              @ subtrai 1 de r9 para ser igual a posicao do ultimo caractere
 
                 ldrb r11, [r10, r9] @ carrega o byte especificado
 
@@ -289,7 +298,7 @@ _start:
                 cmp r9, #0                  @ se r9 for 0, todos os caracteres foram percorridos, logo, contagem acabou
                 beq _fim                    @ desvia para encerrar o contador
 
-                mov r11, #57              @ adiciona o digito 9 ao registrador r1   
+                mov r11, #57                @ adiciona o digito 9 ao registrador r1   
                 strb r11, [r10, r9]         @ registra no byte especificado
 
 
@@ -319,15 +328,13 @@ _start:
                         subtrair_anterior:
                                 sub r11, #1    @ subtrai 1
                                 strb r11, [r10, r9]
-                        b while_num
+                        b contador
                 b loop_anteriores
 
                 subtrai:
                         sub r11, #1         @ se r11 nao for igual a zero, subtrai 1
                         strb r11, [r10, r9] @ registra no byte especificado
-                b while_num
-        bge contador            @ enquanto r9 for maior ou igual a zero, continue
-    
+        b contador
         b _end
 _erro1:
         print pular_linha len_pular_linha
@@ -349,7 +356,7 @@ _end:
 
 @ variaveis utilizadas no codigo
 .data
-        num: .ascii "10"
+        num: .ascii "1000"
         len_num = .-num
 
         erro_num: .ascii "Nao e um numero inteiro!" 
@@ -374,6 +381,19 @@ _end:
 
 	fileName: .asciz "/dev/mem"
 	gpioaddr: .word 0x20200 @carrega o endereco os onde registradores do controlador GPIO são mapeados na memória
+
+        @ pino do LED
+        pin6:   .word 0
+                .word 18
+                .word 6
+
+        @ pinos dos botoes
+        pin19:  .word 4
+                .word 27
+                .word 524288
+        pin26:  .word 8
+                .word 18
+                .word 67108864 
 
         @ pinos do display LCD
         pinRS:	@ Pino RS - GPIO25

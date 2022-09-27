@@ -259,6 +259,7 @@ _start:
                 ble contador    @ se for menor ou igual a zero, devia para o contador
         b verificacao_num
         
+        @setString msg_inicial len_msg_inicial  @ mostra um mensagem no display
         /*iniciar:
 		GPIOReadRegister pin19
                 cmp r0, r3
@@ -358,8 +359,8 @@ _end:
 
 @ variaveis utilizadas no codigo
 .data
-        iniciar: .ascii "INICIAR?"
-        len_iniciar = .-iniciar
+        msg_inicial: .ascii "INICIAR?"
+        len_iniciar = .-msg_inicial
 
         num: .ascii "1000"
         len_num = .-num

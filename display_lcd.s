@@ -205,7 +205,11 @@
                 ldrb r11, [r10, r9]     /* Load Register Byte 
                                            carrega 1 byte na posicao indicada*/
                 setCaractere r11        @ passa o caractere para ser exibito no display
-                entryModeSet            @ move o cursor para a direita
+                @entryModeSet            @ move o cursor para a direita
+                /*
+                        ao chamar o entryModeSet Lacouuuu
+                 */
+                
                 add r9, #1
                 cmp r9, #\len_texto      @ compara com o tamanho do caractere -1
         bne loop_byte
@@ -263,8 +267,8 @@ _start:
         /*iniciar:
 		GPIOReadRegister pin19
                 cmp r0, r3
-                bne contagem
-        b inciar*/
+                bne contador
+        b iniciar*/
 
         contador:
                 @ verifica se o botao do pino 19 foi precionado novamente, se sim, pausa
@@ -360,7 +364,7 @@ _end:
 @ variaveis utilizadas no codigo
 .data
         msg_inicial: .ascii "INICIAR?"
-        len_iniciar = .-msg_inicial
+        len_msg_inicial = .-msg_inicial
 
         num: .ascii "1000"
         len_num = .-num

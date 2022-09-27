@@ -235,14 +235,7 @@
 .global _start
 
 _start:
-	iniciar_display
-	
-        /*iniciar:
-		GPIOReadRegister pin19
-                cmp r0, r3
-                bne contagem
-        b inciar*/
-
+	iniciar_display        
 
         @ Verifica se os caracteres inseridos foram corretos
 	verificacao_erros:
@@ -266,6 +259,12 @@ _start:
                 ble contador    @ se for menor ou igual a zero, devia para o contador
         b verificacao_num
         
+        /*iniciar:
+		GPIOReadRegister pin19
+                cmp r0, r3
+                bne contagem
+        b inciar*/
+
         contador:
                 @ verifica se o botao do pino 19 foi precionado novamente, se sim, pausa
                 /*GPIOReadRegister pin19 
@@ -276,12 +275,12 @@ _start:
                         cmp r0, r3
                 bne _start*/
 
-                @clearDisplay            @ limpa a tela do display
-                @nanosleep second, 0     @ aguarda 1 segundo
-                setString num len_num   @ mostra um numero no display 
+                @setString num len_num   @ mostra um numero no display 
+                clearDisplay             @ limpa a tela do display
+                nanosleep second, 0      @ aguarda 1 segundo
 
-                @ r9 tem guardado a qtd de numeros-1
-                ldr r10, =num
+                @r9 tem guardado a qtd de numeros-1
+                @ldr r10, =num
 
                 print pular_linha len_pular_linha
                 print num len_num
@@ -337,16 +336,19 @@ _start:
         b contador
         b _end
 _erro1:
+        @setString erro_size len_erro_size
         print pular_linha len_pular_linha
         print erro_size len_erro_size
 	print pular_linha len_pular_linha
         b _end
 _erro2:
+        @setString erro_num len_erro_num
 	print pular_linha len_pular_linha
         print erro_num len_erro_num
 	print pular_linha len_pular_linha
         b _end
 _fim:
+        @setString fim len_fim
         print pular_linha len_pular_linha
         print fim len_fim
 	print pular_linha len_pular_linha
@@ -356,6 +358,9 @@ _end:
 
 @ variaveis utilizadas no codigo
 .data
+        iniciar: .ascii "INICIAR?"
+        len_iniciar = .-iniciar
+
         num: .ascii "1000"
         len_num = .-num
 

@@ -1,4 +1,4 @@
-main = display_lcd
+main = display
 
 $(main): $(main).o
 	ld -o $(main) $(main).o

@@ -1,17 +1,33 @@
 /* map.s */
 
 @ Constantes importantes para o programa
-.equ pagelen, 4096
-.equ setregoffset, 28
 .equ clrregoffset, 40
-.equ prot_read, 1
-.equ prot_write, 2
+.equ setregoffset, 28
 .equ map_shared, 1
 .equ sys_open, 5
 .equ sys_map, 192
 .equ nano_sleep, 162
+.equ prot_read, 1
+.equ prot_write, 2
+.equ pagelen, 4096
 .equ level, 52
  
+
+@----------------------Macro da nano sleep de ms--------------------@
+.macro nanoSleep timespecnano
+        LDR R0,=timespecsec @carrega o valor da variavel timespecsec
+        LDR R1,=\timespecnano @paramentro da macro
+        MOV R7, #nano_sleep
+        SVC 0
+.endm
+
+@----------------Macro da nano sleep de 1s para o contador----------@
+.macro  time1s
+        LDR R0,=second  @adiciona o valor da variavel second
+        LDR R1,=\time1s @paramentro da macro
+        MOV R7, #nano_sleep
+        SVC 0
+.endm
 
 /*======================================================
         Funcao de espara
@@ -23,11 +39,11 @@
                 obs:    r0 carrega o valor em s
                         r1 carrega o valor em ms
   ------------------------------------------------------*/
-.macro nanosleep segundo, milissegundo
-        LDR R0,=\segundo        @adiciona o valor da variavel second
-        LDR R1,=\milissegundo   @paramentro da macro
-        MOV R7, #nano_sleep
-        SVC 0
+.macro nanosleep2 segundo, milissegundo
+        ldr R0,=\segundo        @adiciona o valor da variavel second
+        ldr R1,=\milissegundo   @paramentro da macro
+        mov R7, #nano_sleep
+        swi 0
 .endm
 
 /*======================================================

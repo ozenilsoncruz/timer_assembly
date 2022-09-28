@@ -34,29 +34,30 @@ _start:
     b verificacao_num
 
     setString msg_inicial len_msg_inicial  @ mostra um mensagem no display
-    iniciar:
-        GPIOReadRegister pin19
-        cmp r0, r3
-        bne contador
-    b iniciar
+    @iniciar:
+       @ GPIOReadRegister pin19
+       @ cmp r0, r3
+       @ bne contador
+    @b iniciar
 
     contador:
         @ verifica se o botao do pino 19 foi precionado novamente, se sim, pausa
-        GPIOReadRegister pin19 
-        cmp r0, r3
-        bne iniciar
+        @GPIOReadRegister pin19 
+        @cmp r0, r3
+        @bne iniciar
         @ verifica se o botao do pino 26 foi precionado, se sim, reinicia
-        GPIOReadRegister pin26
-        cmp r0, r3
-        bne _start
+        @GPIOReadRegister pin26
+        @cmp r0, r3
+        @bne _start
 
 	clearDisplay
+	@push {r1, r2, lr}
         setString num len_num   @ mostra um numero no display
+	@pop {r1, r2, pc}
         print pular_linha len_pular_linha
         print num len_num
         print pular_linha len_pular_linha
         nanoSleep1s timespecnano1s      @ aguarda 1 segundo
-
         mov r9, #len_num
         sub r9, #1                  @ subtrai 1 de r9 para ser igual a posicao do ultimo caractere
 
@@ -148,20 +149,20 @@ _fim:
     len_pular_linha = .-pular_linha
 
     second: .word 1 @definindo 1 segundo no nanosleep
-	timenano: .word 0000000000 @definindo o milisegundos para o segundo passar no nanosleep
-	timespecsec: .word 0 @definição do nano sleep 0s permitindo os milissegundos
-	timespecnano20: .word 20000000 @chamada de nanoSleep
-	timespecnano5: .word 5000000 @valor em milisegundos para lcd
-	timespecnano150: .word 150000 @valor em milisegundos para LCD
-	timespecnano1s: .word 999999999 @valor para delay de contador
+    timenano: .word 0000000000 @definindo o milisegundos para o segundo passar no nanosleep
+    timespecsec: .word 0 @definição do nano sleep 0s permitindo os milissegundos
+    timespecnano20: .word 20000000 @chamada de nanoSleep
+    timespecnano5: .word 5000000 @valor em milisegundos para lcd
+    timespecnano150: .word 150000 @valor em milisegundos para LCD
+    timespecnano1s: .word 999999999 @valor para delay de contador
 
-	fileName: .asciz "/dev/mem"
-	gpioaddr: .word 0x20200 @carrega o endereco os onde registradores do controlador GPIO são mapeados na memória
+    fileName: .asciz "/dev/mem"
+    gpioaddr: .word 0x20200 @carrega o endereco os onde registradores do controlador GPIO são mapeados na memória
 
     @ pino do LED
-    pin6:   .word 0
-            .word 18
-            .word 6
+    pin6:   .word 0  @ A area da memoria onde vai dicar o fino
+            .word 18 @ A posicao do pino na momoria
+            .word 6  @ O pino especifico
 
     @ pinos dos botoes
     pin19:  .word 4

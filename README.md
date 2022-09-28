@@ -35,27 +35,26 @@ Com o objetivo de desenvolver uma biblioteca para uso futuro em conjunto com um 
 
 ## LCD
 
-
-
-
 ### Especificação
 
 Ao todo, o LCD possui 16 pinos, dispostos dessa forma:
 
-- **1** negativo
-- **2** positivo tensão de alimentação de 5 volts
-- **3** contraste do caractere na tela
-- **4** controle
+- **1** GND
+- **2** VCC(Tensão 5V)
+- **3** controle de contraste dos caracteres
+- **4** controle para qual tipo de comando
 - **5** enviar ou ler dados
 - **6** enviar comando dos pinos de dados
 - **7 - 14** pinos de entrada de dados
-- **15 e 16** controlar o backlight, quando disponível
+- **15 e 16** responsáveis por controlar o backlight, quando disponível (Vcc e GND respectivamente)
 
 ### Arquitetura interna
 
 Além da pinagem, vale ressaltar que o LCD tem 3 módulos de memória para diferentes usos, são esses:
 
-**CGROM _(Character Graphics Read only Memory)_:** Esta ROM faz parte do microcontrolador de exibição no LCD e armazena todos os padrões padrão para os caracteres de matriz de pontos de 5 x 7. Por exemplo: se quisermos exibir o caractere "A", precisamos enviar o código ASCII 65 (decimal) para o DDRAM. O controlador de exibição procura o padrão de pontos a ser exibido para este código no CGROM e acende os apropriados para "A".
+**CGROM _(Character Graphics Read only Memory)_:** 
+
+Essa ROM faz parte do microcontrolador de exibição no LCD e armazena todos os padrões padrão para os caracteres de matriz de pontos de 5 x 7. Por exemplo: se quisermos exibir o caractere "A", precisamos enviar o código ASCII 65 (decimal) para o DDRAM. O controlador de exibição procura o padrão de pontos a ser exibido para este código no CGROM e acende os apropriados para "A".
 
 <div id="fpga" style="display: inline_block" align="center">
 			<img src="/resource/TABLE.png"/><br>
@@ -64,8 +63,11 @@ Além da pinagem, vale ressaltar que o LCD tem 3 módulos de memória para difer
 		</p>
 	</div>
 
-**CGRAM:** possibilita a criação de caracteres especiais
+**CGRAM _(Character Graphics Random Access Memory)_:** 
 
-**DDRAM:** RAM para escrita na tela do display
+Permite que o usuário defina tipos de caracteres não padronizados suplementares especiais que não estão no CGROM. Você pode carregar suas próprias formas de padrão de pontos, por exemplo. um retângulo em CGRAM e usando certos códigos reservados em DDRAM, chame-os para exibição.
 
-## Conclusão
+**DDRAM _(Data Display Random Access Memory)_:** 
+
+É o buffer de dados do display. Cada caractere no visor tem uma localização DDRAM correspondente e o byte carregado no DDRAM controla qual caractere é exibido.
+

@@ -11,8 +11,9 @@ _start:
     inicirDisplay
     entryModeSet
 
+    setString msg_inicial len_msg_inicial
     @ verifica se o numero esta dentro do limite permitido
-    verificacao_erros:
+    /*verificacao_erros:
         mov r9, #len_num
         cmp r9, #32
         bgt _erro1                  @ se for maior, que 32, erro!
@@ -120,7 +121,7 @@ _fim:
     print pular_linha len_pular_linha
     print fim len_fim
     print pular_linha len_pular_linha
-    .ltorg
+    .ltorg*/
     mov r7, #1
     swi 0
 

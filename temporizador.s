@@ -50,6 +50,7 @@ _start:
         cmp r0, r3
         bne _start
 
+	clearDisplay
         setString num len_num   @ mostra um numero no display
         print pular_linha len_pular_linha
         print num len_num

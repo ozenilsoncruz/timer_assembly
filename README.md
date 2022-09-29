@@ -33,6 +33,27 @@ Com o objetivo de desenvolver uma biblioteca para uso futuro em conjunto com um 
 
 </details>
 
+### Autores
+<div align="justify">
+  <li><a href="https://github.com/traozin">@Antônio Neto</a></li>
+  <li><a href="https://github.com/ozenilsoncruz">@ozenilsoncruz</a></li>
+</div>
+
+### Instruções
+
+1. Em uma Raspiberry Pi Zero W, clone o repositório.
+   ```sh
+   git clone https://github.com/ozenilsoncruz/timer_assembly
+   ```
+2. Dentro da pasta execute os passos abaixo:
+    1. Makefile:
+          ```sh
+          Make
+          ```
+    2. Script 
+          ```sh
+          sudo ./temporizador
+          ```
 ## LCD
 
 ### Especificação
@@ -72,17 +93,11 @@ Permite que o usuário defina tipos de caracteres não padronizados suplementare
 É o buffer de dados do display. Cada caractere no visor tem uma localização DDRAM correspondente e o byte carregado no DDRAM controla qual caractere é exibido.
 
 
-## Desenvolvimento
-
-<details>
-<summary>Soluções para os requisitos</summary>
-
----
+## Soluções
 
 ### Verificação de erroos
 
 O temporizador utiliza um algoritmo para subtrair strings. Para isso, afim de evitar erros, antes de iniciar a contagem são verificados os caracteres inseridos na string. Se for maior que a capacidade de exibição do display ou se algum dos caracteres não for um número com representação ASCII, um erro é lançado no display LCD e no monitor.
-
 O código que realiza essas funções pode ser visto abaixo.
 
 ```s
@@ -111,13 +126,13 @@ O código que realiza essas funções pode ser visto abaixo.
 ### Contador
 
 Para subtrair a string o algoritimo utiliza a lógica de uma subtração simples:
-	1. Carrega a String em um registrador com o comando ldr;
-	2. Em um loop, seleciona cada byte da String (Cada caractere ocupa 1 byte) com o comando ldrb;
-	2. Verifica se o último digito é 0, se não for, subtrai 1;
-	3. Se for 0, verifica o anterior e adiciona 9;
-	4. O processo de verificação dos anteriores só é encerrado após encontrar um digito maior que 0;
-	5. Carrega o valor de volta na variável definida
-	5. O loop é encerrado quando todos os caracteres são iguais a 0;
+1. Carrega a String em um registrador com o comando ldr;
+2. Em um loop, seleciona cada byte da String (Cada caractere ocupa 1 byte) com o comando ldrb;
+3. Verifica se o último digito é 0, se não for, subtrai 1;
+4. Se for 0, verifica o anterior e adiciona 9;
+5. O processo de verificação dos anteriores só é encerrado após encontrar um digito maior que 0;
+6. Carrega o valor de volta na variável definida
+7. O loop é encerrado quando todos os caracteres são iguais a 0;
 ```s
     ...
 
@@ -129,7 +144,7 @@ Para subtrair a string o algoritimo utiliza a lógica de uma subtração simples
 	
 	setString msg_inicial len_msg_inicial  @ mostra um mensagem no display
 	
-        @nanoSleep1s timespecnano1s      @ aguarda 1 segundo
+        nanoSleep segundo      @ aguarda 1 segundo
         mov r9, #len_num
         sub r9, #1                  @ subtrai 1 de r9 para ser igual a posicao do ultimo caractere
         ldrb r11, [r10, r9]         @ carrega o byte especificado
@@ -252,4 +267,3 @@ O código abaixo possui dois loops, um para selecionar o byte correspondente e o
 	cmp r9, r13              @ compara com 0
      bne loop_byte
 ```
----

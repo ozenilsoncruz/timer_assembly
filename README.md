@@ -95,7 +95,7 @@ Permite que o usuário defina tipos de caracteres não padronizados suplementare
 
 ## Soluções
 
-### Verificação de erroos
+### Verificação de erros
 
 O temporizador utiliza um algoritmo para subtrair strings. Para isso, afim de evitar erros, antes de iniciar a contagem são verificados os caracteres inseridos na string. Se for maior que a capacidade de exibição do display ou se algum dos caracteres não for um número com representação ASCII, um erro é lançado no display LCD e no monitor.
 O código que realiza essas funções pode ser visto abaixo.

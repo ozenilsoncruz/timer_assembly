@@ -1,5 +1,5 @@
 /* display_lcd.s */
-.include "map.s"
+.include "macros.s"
 
 /*======================================================
         Chama a saida dos pinos do display
@@ -51,7 +51,7 @@
 .macro displayShift
     setDisplay 0, 0, 0, 0, 1
     setDisplay 0, 0, 1, 0, 0
-    nanoSleep timespecnano150
+    nanoSleep timeZero, timespecnano120
 .endm
 
 /*======================================================
@@ -66,11 +66,11 @@
 .macro entryModeSet
     setDisplay 0, 0, 0, 0, 0
     setDisplay 0, 1, 1, 1, 0
-    nanoSleep timespecnano150
+    nanoSleep timeZero, timespecnano120
 
     setDisplay 0, 0, 0, 0, 0
     setDisplay 0, 0, 1, 1, 0
-    nanoSleep timespecnano150
+    nanoSleep timeZero, timespecnano120
     .ltorg
 .endm
 
@@ -84,39 +84,43 @@
                 nanoSleep: presente no map.s, utilizada
                 para aguardar um determinado tempo
   ------------------------------------------------------*/
-.macro inicirDisplay
+.macro iniciarDisplay
+    @ function set
     setDisplay 0, 0, 0, 1, 1  
-    nanoSleep timespecnano5
+    nanoSleep timeZero, timespecnano5
 
-    setDisplay 0, 0, 0, 1, 1 
-    nanoSleep timespecnano150  
+    @ function set
+    setDisplay 0, 0, 0, 1, 1
+    nanoSleep timeZero, timespecnano120  
 
+    @ function set
     setDisplay  0, 0, 0, 1, 1
 
 
     setDisplay 0, 0, 0, 1, 0
-    nanoSleep timespecnano150  
+    nanoSleep timeZero, timespecnano120  
 
     .ltorg 
 
+    @ function set
     setDisplay 0, 0, 0, 1, 0 
-
     setDisplay 0, 0, 0, 0, 0
-    nanoSleep timespecnano150 
+    nanoSleep timeZero, timespecnano120 
+
+    @ display off
     setDisplay 0, 0, 0, 0, 0 
-
     setDisplay 0, 1, 0, 0, 0  
-    nanoSleep timespecnano150
+    nanoSleep timeZero, timespecnano120
 
+    @ display clear
     setDisplay 0, 0, 0, 0, 0  
-
     setDisplay 0, 0, 0, 0, 1  
-    nanoSleep timespecnano150 
+    nanoSleep timeZero, timespecnano120 
 
+    @ entry mode set
     setDisplay 0, 0, 0, 0, 0
-
     setDisplay 0, 0, 1, 1, 0 
-    nanoSleep timespecnano150
+    nanoSleep timeZero, timespecnano120
 
     .ltorg
 .endm
@@ -133,7 +137,7 @@
 .macro clearDisplay
     setDisplay 0, 0, 0, 0, 0
     setDisplay 0, 0, 0, 0, 1
-    nanoSleep timespecnano150 
+    nanoSleep timeZero, timespecnano120 
 .endm
 
 /*======================================================
@@ -150,15 +154,15 @@
                         r11 carrega o byte do primeiro caractere
   ------------------------------------------------------*/
 .macro setString texto len_texto
-        clearDisplay           @ limpa a tela do display
-        ldr r10, =\texto       @ passa o valor do texto para r10
-        mov r9, #\len_texto             @ tamanho do texto
-        bl loop_byte
-        .ltorg
+    clearDisplay           @ limpa a tela do display
+    push {r1}
+    ldr r10, =\texto       @ passa o valor do texto para r10
+    mov r9, #0             @ tamanho do texto
+    bl loop_byte
+    pop {r1}          
 .endm
 
 loop_byte:                  @ loop que percorre cada caracter
-    sub r9, #1              @ subtrai 1 do registrador que contem o tamanho da string
     ldrb r11, [r10, r9]     @ Load Register Byte 
                             @ carrega 1 byte na posicao indicada
     @ passa o caractere para ser exibito no display
@@ -166,10 +170,10 @@ loop_byte:                  @ loop que percorre cada caracter
     mov r12, #256            @ variavel auxiliar que define qual bit esta ativo
     loop_bit:                @ percorre todos os 8 bits do bit para sabe o nivel logico
         lsr r12, #1      @ desloca o bit para a direita  ex: 100000000 -> 010000000
-        and r1, r12, r11 @ faz um and entre r1 e r3 para saber se o bit esta ativo ou nao
-        cmp r1, #0
+        and r4, r12, r11 @ faz um and entre r1 e r3 para saber se o bit esta ativo ou nao
+        cmp r4, #0
         beq switch 	 @ se for igual a 0 valor nao sera alterado, se for diferente r2 = 1            
-        mov r1, #1
+        mov r4, #1
         switch:
             @ se for 0 seta no pino DB4
             cmp r6, #0
@@ -195,22 +199,22 @@ loop_byte:                  @ loop que percorre cada caracter
                 GPIOValue pinE, #0 @ atribui 0 ao enable
                 GPIOValue pinRS, #1
                 GPIOValue pinE, #1
-                GPIOValue pinDB7, r1
+                GPIOValue pinDB7, r4
                 b retornar @ pula os outros casos
             case2:
-                GPIOValue pinDB6, r1
+                GPIOValue pinDB6, r4
                 b retornar @ pula os outros casos
             case3:
-                GPIOValue pinDB5, r1
+                GPIOValue pinDB5, r4
                 b retornar @ pula os outros casos
             case4:
-                GPIOValue pinDB4, r1
+                GPIOValue pinDB4, r4
                 GPIOValue pinE, #0
         retornar:
             sub r6, #1       @ subtrai +1 a r0
             cmp r12, #1      @ compara o valor de r0 para saber se ja percorreu o ultimo bit
     bne loop_bit
     displayShift             @ move o cursor para a direita
-    cmp r9, #0               @ compara com 0
+    cmp r9, r13              @ compara com 0
 bne loop_byte
 bx lr                       @ retorna para a macro que fez a chamada

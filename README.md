@@ -36,7 +36,7 @@ Com o objetivo de desenvolver uma biblioteca para uso futuro em conjunto com um 
 ### Autores
 <div align="justify">
   <li><a href="https://github.com/traozin">@Antônio Neto</a></li>
-  <li><a href="https://github.com/ozenilsoncruz">@ozenilsoncruz</a></li>
+  <li><a href="https://github.com/ozenilsoncruz">@Ozenilson Cruz</a></li>
 </div>
 
 ### Instruções
@@ -48,7 +48,7 @@ Com o objetivo de desenvolver uma biblioteca para uso futuro em conjunto com um 
 2. Dentro da pasta execute os passos abaixo:
     1. Makefile:
           ```sh
-          Make
+          make
           ```
     2. Script 
           ```sh

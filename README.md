@@ -268,5 +268,5 @@ O código abaixo possui dois loops, um para selecionar o byte correspondente e o
      bne loop_byte
 ```
 
-|.............................................. :arrow_up: [Voltar ao topo](#IoTPlatform) :arrow_up: .............................................| :arrow_right: [Próximo Problema](https://github.com/traozin/IOInterface) |
+|.......................................................... :arrow_up: [Voltar ao topo](#IoTPlatform) :arrow_up: ..........................................................| :arrow_right: [Próximo Problema](https://github.com/traozin/IOInterface) |
 | :----: |-----|
